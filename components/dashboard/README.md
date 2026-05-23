@@ -1,4 +1,4 @@
-# dashboard: A Personal Operating System, One Live View
+# dashboard: a personal operating system in one calm live view, projected from the files the agents already use
 
 The piece I've iterated on most. One page that pulls everything I'm running, across every organisation and role I work in and my personal life, into a single calm view. It's a projection of plain-text files, grown over many rounds of real use.
 
@@ -43,10 +43,12 @@ Visually it travelled from plain, to a calm-tech aesthetic, to a warmer editoria
 
 ## See it (the visual evolution)
 
-- [examples/demo/early.html](examples/demo/early.html) — roughly where it started: a plain single page.
-- [examples/demo/index.html](examples/demo/index.html) — closer to where it is now: a calm two-accent briefing where teal is the one interactive accent and a warm clay marks only the ranked Top-3 band. Type-coded chips (area, type, who, age), a priority-ranked top set, a health bar that names the issue, cockpit area views grouped by who acts, routines, a heartbeat of every scheduled job, and a kanban roadmap. The same item shows in several views, because every view is a projection of one object set.
+**▶ [View the live demo](https://claud-williams.github.io/agentic-ops/components/dashboard/examples/demo/index.html)** - the current version, interactive, in your browser. ([the early version](https://claud-williams.github.io/agentic-ops/components/dashboard/examples/demo/early.html), for the contrast.)
 
-Both are wired only to fake data (the fictional Jordan Vale at Northwind Logistics), so they are safe to share or host on GitHub Pages.
+- [examples/demo/index.html](examples/demo/index.html) (source) - closer to where it is now: a calm two-accent briefing where teal is the one interactive accent and a warm clay marks only the ranked Top-3 band. Type-coded chips (area, type, who, age), a priority-ranked top set, a health bar that names the issue, cockpit area views grouped by who acts, routines, a heartbeat of every scheduled job, and a kanban roadmap. The same item shows in several views, because every view is a projection of one object set.
+- [examples/demo/early.html](examples/demo/early.html) (source) - roughly where it started: a plain single page.
+
+Both are wired only to fake data (the fictional Jordan Vale at Northwind Logistics), so they are safe to share or host on GitHub Pages. The live links above render via GitHub Pages.
 
 ## What I learned
 

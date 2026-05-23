@@ -10,7 +10,7 @@ set -u
 TARGET="${1:-}"
 [ -n "$TARGET" ] && [ -d "$TARGET" ] || { echo "usage: scrub_gate.sh <target_dir>" >&2; exit 2; }
 
-GREP=(grep -rInI --exclude-dir=.git)
+GREP=(grep -rInI --exclude-dir=.git --exclude=scrub_gate.sh)
 BLOCK=0; WARN=0
 
 scan() {  # <bucket> <label> <regex>
@@ -41,5 +41,5 @@ scan WARN  "non-localhost IPv4"    '\b(([0-9]{1,3}\.){3}[0-9]{1,3})\b'
 
 echo "=== verdict ==="
 echo "BLOCK: $BLOCK   WARN: $WARN"
-if [ "$BLOCK" -gt 0 ]; then echo "RESULT: FAIL — publish blocked."; exit 1; fi
+if [ "$BLOCK" -gt 0 ]; then echo "RESULT: FAIL - publish blocked."; exit 1; fi
 echo "RESULT: PASS"; exit 0

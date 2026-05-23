@@ -1,4 +1,4 @@
-# Desktop handoff — 2025-09-14 14:05 (rota tool pilot)
+# Desktop handoff - 2025-09-14 14:05 (rota tool pilot)
 
 ## Done this session
 - Pilot of the rota tool committed to one depot; verification passed.

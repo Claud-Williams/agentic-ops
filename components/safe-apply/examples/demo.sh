@@ -13,7 +13,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMP="$(cd "$HERE/.." && pwd)"
 REPO="$(mktemp -d)"
 
-cd "$REPO"
+cd "$REPO" || exit 2
 git init -q && git config user.email demo@example.com && git config user.name demo
 mkdir -p data
 cat > data/inventory.json <<'JSON'

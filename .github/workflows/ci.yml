@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: demos + scrub gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck (all .sh)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          set -e
+          echo "Checking shell scripts under components/..."
+          find components -type f -name '*.sh' -print0 \
+            | sort -z \
+            | xargs -0 shellcheck --severity=warning
+
+      - name: syntax-check all bash scripts
+        run: |
+          set -e
+          while IFS= read -r f; do
+            bash -n "$f" || { echo "syntax error in $f"; exit 1; }
+          done < <(find components -type f -name '*.sh')
+          echo "all shell scripts parse"
+
+      - name: validate example JSON fixtures
+        run: |
+          set -e
+          while IFS= read -r f; do
+            python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f" \
+              || { echo "invalid JSON: $f"; exit 1; }
+            echo "ok: $f"
+          done < <(find components -type f -name '*.json')
+
+      - name: demo - scrub-gate (pass + fail scenarios)
+        run: bash components/scrub-gate/examples/demo.sh
+
+      - name: demo - safe-apply (applied / reverted / no-op)
+        run: bash components/safe-apply/examples/demo.sh
+
+      - name: demo - scheduler (run example report-only job)
+        run: bash components/scheduler/run_job.sh components/scheduler/jobs/example-tidy-job.md
+
+      - name: demo - leak-audit (clean repo + metadata-only leak)
+        run: bash components/leak-audit/examples/demo.sh
+
+      - name: demo - permission-drift (matching baseline + drifted set)
+        run: bash components/permission-drift/examples/demo.sh
+
+      - name: scrub gate - entire working tree
+        run: bash components/scrub-gate/scrub_gate.sh .

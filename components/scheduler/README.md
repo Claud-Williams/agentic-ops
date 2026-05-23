@@ -1,4 +1,4 @@
-# scheduler: A Plain-Text Job Runner for Overnight Work
+# scheduler: a plain-text job runner that makes overnight automation reliable and re-runnable
 
 The quiet workhorse: it runs jobs while I sleep and reports what happened.
 

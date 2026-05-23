@@ -4,16 +4,16 @@ Fictional persona: **Jordan Vale**, operations lead at the fictional Northwind L
 
 For each decision the system records three things side by side, then the outcome:
 
-- **What the model expected (Jordan's instinct)** — the choice it predicted Jordan would *typically* make, based on their past pattern.
-- **Better call** — what careful analysis suggested was the stronger option, even when it cuts against the habit.
-- **What Jordan chose** — the actual decision.
-- **Outcome** — how it landed.
+- **What the model expected (Jordan's instinct)** - the choice it predicted Jordan would *typically* make, based on their past pattern.
+- **Better call** - what careful analysis suggested was the stronger option, even when it cuts against the habit.
+- **What Jordan chose** - the actual decision.
+- **Outcome** - how it landed.
 
 | Decision | What the model expected (Jordan's instinct) | Better call | What Jordan chose | Outcome |
 |---|---|---|---|---|
-| Roll the new rota tool out to one depot or all six? | One depot — Jordan tends to pilot cautiously | One depot, then a two-week review gate | One depot + review | Two bugs caught before the wider rollout |
-| Hire a contractor or train internally for the integration? | Train internally — Jordan usually builds capability in-house | Contractor for the spike, train in parallel | Contractor + train | Deadline met, capability retained |
-| Cut the underused report or keep it? | Keep it — Jordan is loss-averse about removing things | Cut it, offer to revive on request | Kept it | Still unused a quarter later |
+| Roll the new rota tool out to one depot or all six? | One depot - Jordan tends to pilot cautiously | One depot, then a two-week review gate | One depot + review | Two bugs caught before the wider rollout |
+| Hire a contractor or train internally for the integration? | Train internally - Jordan usually builds capability in-house | Contractor for the spike, train in parallel | Contractor + train | Deadline met, capability retained |
+| Cut the underused report or keep it? | Keep it - Jordan is loss-averse about removing things | Cut it, offer to revive on request | Kept it | Still unused a quarter later |
 
 ## What the tally tells you
 

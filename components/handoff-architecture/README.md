@@ -1,4 +1,4 @@
-# handoff-architecture: Coordinating Several Agents Across Devices
+# handoff-architecture: keeps several AI agents in sync across devices, each reading all state and writing only its own
 
 I run agents on more than one surface: a desktop assistant, a command-line agent, and a phone. This is how they stay in sync without stepping on each other.
 

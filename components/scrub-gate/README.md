@@ -1,4 +1,4 @@
-# scrub-gate: A Publish-Time Scanner for Secrets and Personal Data
+# scrub-gate: a publish-time gate that keeps secrets and personal data out of anything you make public
 
 This is the gate that stands between private work and a public repository.
 
@@ -28,7 +28,7 @@ It exits non-zero on any block, so it can sit in front of a push as a preconditi
 ## See it work
 
 ```bash
-bash examples/demo.sh
+bash components/scrub-gate/examples/demo.sh
 ```
 
 Runs the scanner over a clean sample (passes) and over a sample with a planted key and home path (blocked).

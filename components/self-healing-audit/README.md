@@ -1,4 +1,4 @@
-# self-healing-audit: A System That Audits and Repairs Itself on a Trigger
+# self-healing-audit: keeps an automated system from drifting, auditing its own rules and repairing the safe ones
 
 Most rule-based systems rot quietly. Rules drift, contradict each other, and go stale, and nobody notices until something breaks. This one checks itself on a trigger and fixes what it can safely fix.
 

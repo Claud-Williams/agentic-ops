@@ -28,14 +28,15 @@
 }
 *{box-sizing:border-box;}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-margin:0;background:var(--bg);color:var(--ink);line-height:1.5;
+margin:0;background:var(--bg);color:var(--ink);line-height:1.5;color-scheme:light;
 font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
 text-rendering:optimizeLegibility;}
 .wrap{max-width:1080px;margin:0 auto;padding:30px 26px 24px;}
-h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.01em;}
+h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.01em;color:var(--ink);}
 .gen{font-size:12px;color:var(--muted);margin:3px 0 0;}
 .tabs{display:flex;align-items:center;gap:2px;margin:22px 0 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
 .tab{font-size:13px;padding:9px 14px;color:var(--muted);border:none;background:none;
+appearance:none;-webkit-appearance:none;border-radius:0;
 border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:color 120ms ease;}
 .tab:hover{color:var(--ink);}
 .tab[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent);}
@@ -291,6 +292,24 @@ var DATA = {
     {routine:"Archive completed job tickets", cadence:"weekly", cls:"green", when:"on track", note:"Moves closed tickets out of the live view each week."}
   ],
 
+  // Personal / life-admin lane, kept isolated from work. A time-sensitive row
+  // also surfaces on Today; everything else stays on this spoke.
+  personal:[
+    {domain:"Finance", items:[
+      {title:"Renew the home insurance", detail:"The current policy lapses next Friday; the renewal quote is in and slightly cheaper than letting it auto-renew.", added:"2026-05-18", time_sensitive:true},
+      {title:"Review the pension contribution rate", detail:"Annual check on whether to nudge the monthly contribution up.", added:"2026-05-02", time_sensitive:false}
+    ]},
+    {domain:"Health", items:[
+      {title:"Book the dental check-up", detail:"The six-month check is due; the practice takes bookings online.", added:"2026-05-10", time_sensitive:false}
+    ]},
+    {domain:"Home", items:[
+      {title:"Update the recycling collection reminder", detail:"The council moved to fortnightly; update the calendar so the bins go out on the right week.", added:"2026-05-15", time_sensitive:false}
+    ]},
+    {domain:"Admin", items:[
+      {title:"Renew the passport", detail:"It expires in under nine months, which can block travel; renew now to be safe.", added:"2026-04-28", time_sensitive:false}
+    ]}
+  ],
+
   // System-health signal set, shown as the lights strip and the top bar.
   lights:[
     {key:"Audit", state:"green", msg:"on cadence"},
@@ -415,6 +434,19 @@ function renderToday(){
     o.push("<div class='rest'><p class='t3-label sub'>Also open, ranked</p>");
     rest.forEach(function(it){ o.push(itemHtml(it, true)); });
     if(more) o.push("<div class='more'>+ "+more+" more open items</div>");
+    o.push("</div>");
+  }
+  // personal items surface here only when explicitly time-sensitive (isolation kept)
+  var pts = [];
+  DATA.personal.forEach(function(dom){ dom.items.forEach(function(it){ if(it.time_sensitive) pts.push(it); }); });
+  if(pts.length){
+    o.push("<div class='rest'><p class='t3-label sub'>Personal, time-sensitive</p>");
+    pts.forEach(function(it){
+      var detail = it.detail ? "<div class='detail'><p class='dtl'>"+esc(it.detail)+"</p></div>" : "";
+      var exp = it.detail ? "<span class='exp'>expand &#9662;</span>" : "";
+      o.push("<div class='item'><div class='ttl'><span>"+esc(it.title)+"</span>"+exp+
+             "</div><div class='chips'><span class='chip amber'>personal</span></div>"+detail+"</div>");
+    });
     o.push("</div>");
   }
   o.push("</div></div>");
@@ -545,6 +577,49 @@ function roadmapPanel(){
   return o.join("");
 }
 
+/* ----- To-do (the same items, grouped by who acts) ----- */
+function renderTodo(){
+  var yours = DATA.items.filter(function(e){ return /^[23]\./.test(e.bucket); })
+    .sort(function(a,b){ return scoreItem(b)-scoreItem(a); });
+  var agent = DATA.items.filter(function(e){ return /^4\./.test(e.bucket); })
+    .sort(function(a,b){ return scoreItem(b)-scoreItem(a); });
+  var o = ["<div id='page-todo' class='page'>"];
+  o.push("<p class='section-lead'>Your to-do list, by who acts: what you need to do, what you are waiting on others for, and what the assistant is doing for you. A read-only view over the open items for now.</p>");
+  o.push("<div class='panel'><h2>Your tasks <span class='count'>"+yours.length+" - you act</span></h2>");
+  o.push(yours.length ? yours.map(function(e){ return itemHtml(e, true); }).join("") : "<div class='empty'>Nothing on your list right now.</div>");
+  o.push("</div>");
+  o.push("<div class='panel'><h2>Waiting on others</h2><div class='empty'>Nothing tracked yet. This fills from items tagged as waiting on someone else.</div></div>");
+  o.push("<div class='panel'><h2>Assistant tasks <span class='count'>"+agent.length+" - the assistant acts</span></h2>");
+  o.push(agent.length ? agent.map(function(e){ return itemHtml(e, true); }).join("") : "<div class='empty'>Nothing queued for the assistant right now.</div>");
+  o.push("</div></div>");
+  return o.join("");
+}
+
+/* ----- Personal / life-admin lane ----- */
+function renderPersonal(){
+  var o = ["<div id='page-personal' class='page'>"];
+  o.push("<p class='section-lead'>Your personal and life-admin lane, kept separate from work. Finance, health, home and general admin in one place. Mark a row time-sensitive and it also appears on Today.</p>");
+  DATA.personal.forEach(function(dom){
+    o.push("<div class='panel'><h2>"+esc(dom.domain)+"</h2>");
+    if(dom.items.length){
+      dom.items.forEach(function(it){
+        var chips = [];
+        if(it.time_sensitive) chips.push("<span class='chip amber'>time-sensitive</span>");
+        if(it.added) chips.push("<span class='chip'>added "+esc(it.added)+"</span>");
+        var ch = chips.length ? "<div class='chips'>"+chips.join("")+"</div>" : "";
+        var detail = it.detail ? "<div class='detail'><p class='dtl'>"+esc(it.detail)+"</p></div>" : "";
+        var exp = it.detail ? "<span class='exp'>expand &#9662;</span>" : "";
+        o.push("<div class='item'><div class='ttl'><span>"+esc(it.title)+"</span>"+exp+"</div>"+ch+detail+"</div>");
+      });
+    } else {
+      o.push("<div class='empty'>Nothing in "+esc(dom.domain.toLowerCase())+" right now.</div>");
+    }
+    o.push("</div>");
+  });
+  o.push("</div>");
+  return o.join("");
+}
+
 /* ----- Heartbeat ----- */
 function renderHeartbeat(){
   var o = ["<div id='page-heartbeat' class='page'>"];
@@ -628,8 +703,9 @@ function renderWays(){
     " open items &middot; "+DATA.closed_filtered+" closed filtered &middot; sample data";
 
   // tab bar + status strip
-  var tabsDef = [["today","Today"]].concat(AREAS.map(function(a){ return [a.toLowerCase(), a]; }))
-    .concat([["heartbeat","Heartbeat"],["ways","Ways of working"]]);
+  var tabsDef = [["today","Today"],["todo","To-do"]]
+    .concat(AREAS.map(function(a){ return [a.toLowerCase(), a]; }))
+    .concat([["personal","Personal"],["heartbeat","Heartbeat"],["ways","Ways of working"]]);
   var tb = ["",""];
   tabsDef.forEach(function(t){
     tb.push("<button class='tab' role='tab' aria-selected='"+(t[0]==="today")+"' data-tab='"+t[0]+"'>"+t[1]+"</button>");
@@ -643,7 +719,9 @@ function renderWays(){
 
   // pages
   var pages = renderToday();
+  pages += renderTodo();
   AREAS.forEach(function(a){ pages += renderArea(a); });
+  pages += renderPersonal();
   pages += renderHeartbeat();
   pages += renderWays();
   document.getElementById("pages").innerHTML = pages;

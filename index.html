@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic Operations System</title>
+<style>
+:root{
+  --bg:#f3f2ef;--surface:#fffefb;--ink:#1d1d1b;--muted:#6c6b65;--muted-soft:#9b9a90;
+  --line:#e6e4dd;--accent:#2f6f6a;--accent-ink:#fffefb;--warm:#b0573b;
+  --shadow-sm:0 1px 2px rgba(31,29,26,.05),0 2px 8px rgba(31,29,26,.04);
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+margin:0;background:var(--bg);color:var(--ink);line-height:1.55;color-scheme:light;
+-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+.wrap{max-width:780px;margin:0 auto;padding:60px 26px 72px;}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--warm);margin:0 0 14px;}
+.eyebrow::before{content:"";display:inline-block;width:26px;height:3px;border-radius:2px;background:var(--warm);vertical-align:middle;margin-right:10px;position:relative;top:-3px;}
+h1{font-size:34px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;margin:0 0 14px;color:var(--ink);}
+.lede{font-size:16px;color:#45443d;margin:0 0 8px;max-width:60ch;}
+.sub{font-size:13.5px;color:var(--muted);margin:0 0 34px;max-width:62ch;}
+.cta{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 24px;box-shadow:var(--shadow-sm);margin:0 0 42px;}
+.cta h2{font-size:17px;font-weight:600;margin:0 0 5px;color:var(--ink);}
+.cta p{font-size:13.5px;color:var(--muted);margin:0 0 16px;max-width:58ch;}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-size:14px;font-weight:600;padding:10px 18px;border-radius:10px;transition:opacity 120ms ease;}
+.btn:hover{opacity:.9;}
+.btn .arr{margin-left:6px;}
+.note-inline{font-size:12px;color:var(--muted-soft);margin:12px 0 0;}
+h3.section{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 16px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:620px){.grid{grid-template-columns:1fr;}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow-sm);}
+.card h4{font-size:14px;font-weight:600;margin:0 0 4px;color:var(--ink);}
+.card p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.5;}
+footer{font-size:12px;color:var(--muted-soft);margin-top:44px;padding-top:18px;border-top:1px solid var(--line);line-height:1.6;max-width:66ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img src="docs/wordmark.svg" alt="agentic-ops" style="height:34px;display:block;margin:0 0 22px;">
+  <p class="eyebrow">Portfolio</p>
+  <h1>Agentic Operations System</h1>
+  <p class="lede">A self-improving, self-healing automation system I built to run my own daily operations, and to keep itself lean, safe, and honest while it does.</p>
+  <p class="sub">A curated, public extract. The architecture and code are real; the sample data is fictional (Jordan Vale at the fictional Northwind Logistics).</p>
+
+  <div class="cta">
+    <h2>The dashboard</h2>
+    <p>One live view of the whole system: a calm daily briefing projected from plain-text source files. The demo is interactive and wired only to fictional sample data, so it is safe to explore.</p>
+    <a class="btn" href="components/dashboard/examples/demo/index.html">View the live demo <span class="arr">&rarr;</span></a>
+    <p class="note-inline">No sign-in. Click the tabs, expand a card, or click a tag to filter the view.</p>
+  </div>
+
+  <h3 class="section">What else is in the system</h3>
+  <div class="grid">
+    <div class="card"><h4>safe-apply</h4><p>A git-backed safety floor that makes overnight autonomy safe rather than scary: every change is verified and one step from undo.</p></div>
+    <div class="card"><h4>scrub-gate</h4><p>A publish-time scanner that blocks secrets, personal data and home-machine paths from ever reaching a public repository.</p></div>
+    <div class="card"><h4>scheduler</h4><p>A plain-text overnight job runner: read-only or act mode, with retry and honest reporting.</p></div>
+    <div class="card"><h4>principal-modelling</h4><p>Learns how a person thinks, can act with their judgement, and actively sharpens it over time.</p></div>
+    <div class="card"><h4>self-healing-audit</h4><p>Audits its own rules for drift on a trigger and repairs the safe ones, earning autonomy gradually.</p></div>
+    <div class="card"><h4>handoff-architecture</h4><p>How several agents across devices stay in sync: read everyone's state, write only your own.</p></div>
+    <div class="card"><h4>calibration-method</h4><p>Logs predicted versus actual effort and feeds the bands back, so estimates correct themselves.</p></div>
+  </div>
+
+  <footer>
+    The full write-ups and source for each component live in this repository's README and folders. Sample data throughout uses a fictional persona and resembles no real person or organisation.
+  </footer>
+</div>
+</body>
+</html>

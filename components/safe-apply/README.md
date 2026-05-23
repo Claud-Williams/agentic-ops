@@ -1,4 +1,4 @@
-# safe-apply: A Git-Backed Safety Floor for Unattended Changes
+# safe-apply: a safety floor that lets automation change files unattended, with every change verified and one step from undo
 
 This is the piece that makes overnight autonomy safe rather than scary.
 
@@ -34,10 +34,10 @@ Decouple safety from human review. Instead of trusting each job to be careful, o
 ## See it work
 
 ```bash
-bash examples/demo.sh
+bash components/safe-apply/examples/demo.sh
 ```
 
-It spins up a throwaway repo for the fictional Northwind Logistics and runs three scenarios: a good change (committed), a change that corrupts the data file (reverted automatically, file restored exactly), and a no-op (reported as such).
+Requires `git` and `python3` (the verify step validates JSON). It spins up a throwaway repo for the fictional Northwind Logistics and runs three scenarios: a good change (committed), a change that corrupts the data file (reverted automatically, file restored exactly), and a no-op (reported as such).
 
 ## What I learned
 

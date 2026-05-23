@@ -50,7 +50,7 @@ echo "----- end apply output -----"
 
 # Did anything actually change?
 if [ -z "$(git status --porcelain)" ]; then
-    echo "RESULT: NO-CHANGE — apply made no edits (apply rc=$APPLY_RC)."
+    echo "RESULT: NO-CHANGE - apply made no edits (apply rc=$APPLY_RC)."
     exit 0
 fi
 
@@ -64,14 +64,14 @@ if [ "$VERIFY_RC" -eq 0 ] && [ "$APPLY_RC" -eq 0 ]; then
     git add -A
     git commit -q -m "$JOB_TAG: applied ($STAMP)"
     NEW="$(git rev-parse --short HEAD)"
-    echo "RESULT: APPLIED — verified clean, committed $NEW."
+    echo "RESULT: APPLIED - verified clean, committed $NEW."
     echo "Roll back with: git -C \"$REPO\" revert $NEW"
     echo "Files changed:"; echo "$CHANGED_FILES"
     exit 0
 else
     git reset -q --hard "$PRE"
     git clean -fdq
-    echo "RESULT: REVERTED — verify rc=$VERIFY_RC, apply rc=$APPLY_RC; restored to $PRE. Nothing kept."
+    echo "RESULT: REVERTED - verify rc=$VERIFY_RC, apply rc=$APPLY_RC; restored to $PRE. Nothing kept."
     echo "Verify output:"; printf '%s\n' "$VERIFY_OUT" | sed 's/^/    /' | head -20
     exit 1
 fi

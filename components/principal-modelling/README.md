@@ -1,4 +1,4 @@
-# principal-modelling: A System That Learns How Someone Thinks, and Sharpens It
+# principal-modelling: learns how a person thinks, acts with their judgement, and sharpens it over time
 
 The most useful assistant is not the one that executes fastest. It's the one that learns how a specific person thinks, can act with their judgement when they're not in the room, and pushes that judgement to get sharper over time.
 

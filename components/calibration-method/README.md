@@ -1,4 +1,4 @@
-# calibration-method: Predicting Effort, Then Correcting the Prediction
+# calibration-method: effort estimates that get more accurate over time, by feeding predicted-versus-actual back in
 
 Estimates are usually guesses that never get checked. This is a small habit that turns them into something that gets better over time.
 
