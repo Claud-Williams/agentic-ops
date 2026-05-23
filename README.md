@@ -1,5 +1,8 @@
 <p align="left">
-  <img src="docs/wordmark.svg" alt="agentic-ops" width="280">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/wordmark-dark.svg">
+    <img src="docs/wordmark.svg" alt="agentic-ops" width="280">
+  </picture>
 </p>
 
 <p align="left">
