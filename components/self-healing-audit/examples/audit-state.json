@@ -1,0 +1,10 @@
+{
+  "last_audit_close": "2025-09-14T03:00:00Z",
+  "rule_changes_since_last_audit": 3,
+  "trigger_thresholds": {
+    "rule_changes": 5,
+    "days_since": 31
+  },
+  "mode": "report-only",
+  "_note": "The daily check reads this; the full audit fires when rule_changes_since_last_audit >= 5 OR it has been > days_since since last_audit_close, then resets the counter at close."
+}

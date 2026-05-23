@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cowork OS Dashboard - interactive demo (sample data)</title>
+<style>
+/* Cowork OS - elevated calm with a measured touch of warmth.
+   Two accents, used deliberately: teal is the single interactive accent
+   (tabs, links, expand); clay is a warm emphasis-only secondary (the Top-3
+   ranked band rail + rank badge), never interactive. Colour stays semantic;
+   type holds to two weights and a tight scale. */
+:root{
+  --bg:#f3f2ef;          /* off-white base, faintly warm */
+  --surface:#fffefb;     /* near-white panel */
+  --ink:#1d1d1b;
+  --muted:#6c6b65;
+  --muted-soft:#9b9a90;
+  --line:#e6e4dd;
+  --line-soft:#efece5;
+  --accent:#2f6f6a;      /* teal: the one interactive accent */
+  --warm:#b0573b;        /* clay: the measured warm secondary, emphasis only */
+  --red-bg:#fbe9e7;--red:#992020;
+  --amber-bg:#f7ecd3;--amber:#6a4805;
+  --green:#2f7d4f;
+  --chip-bg:#eeebe4;--chip-ink:#54534d;
+  --shadow-sm:0 1px 2px rgba(31,29,26,.05),0 2px 8px rgba(31,29,26,.04);
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+margin:0;background:var(--bg);color:var(--ink);line-height:1.5;
+font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+text-rendering:optimizeLegibility;}
+.wrap{max-width:1080px;margin:0 auto;padding:30px 26px 24px;}
+h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.01em;}
+.gen{font-size:12px;color:var(--muted);margin:3px 0 0;}
+.tabs{display:flex;align-items:center;gap:2px;margin:22px 0 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.tab{font-size:13px;padding:9px 14px;color:var(--muted);border:none;background:none;
+border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;transition:color 120ms ease;}
+.tab:hover{color:var(--ink);}
+.tab[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent);}
+.strip{margin-left:auto;display:flex;gap:14px;align-items:center;padding-right:2px;flex-wrap:wrap;}
+.light{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot.green{background:var(--green);}.dot.amber{background:var(--amber);}.dot.red{background:var(--red);}.dot.muted{background:var(--muted-soft);}
+/* Today system-health bar: one colour-coded line that names the issue */
+.healthbar{display:flex;align-items:center;gap:9px;padding:10px 15px;border-radius:11px;font-size:13px;margin:0 0 6px;border:1px solid var(--line);}
+.healthbar .dot{flex:none;width:9px;height:9px;}
+.healthbar.green{background:#eef5f0;color:#275f3c;border-color:#cfe5d6;}
+.healthbar.amber{background:var(--amber-bg);color:var(--amber);border-color:#e6ce98;}
+.healthbar.red{background:var(--red-bg);color:var(--red);border-color:#e7b8b3;font-weight:600;}
+.page{display:none;}.page.active{display:block;}
+.cols{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;margin-top:18px;}
+@media(max-width:760px){.cols{grid-template-columns:1fr;}.strip{width:100%;margin:8px 0 0;}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+padding:18px 20px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.panel+.panel{margin-top:16px;}
+.panel h2{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 13px;}
+.panel h2 .count{font-size:10px;font-weight:500;letter-spacing:.02em;text-transform:none;color:var(--muted-soft);margin-left:8px;}
+.needs{font-size:13px;color:var(--muted);margin:0 0 16px;}
+.needs b{color:var(--ink);font-weight:600;}
+.t3-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--warm);margin:0 0 10px;}
+.t3-label.sub{color:var(--muted);margin-top:16px;}
+.item{padding:11px 0;border-top:1px solid var(--line-soft);}
+.item:first-of-type{border-top:none;}
+/* Top 3: a ranked band - all three carry the warm rail and a rank number; the
+   #1 item stays slightly larger as the focal point. */
+.top3 .item{padding:13px 0 13px 15px;border-left:2px solid var(--warm);}
+.item .ttl{font-size:14px;font-weight:600;margin:0;display:flex;justify-content:space-between;gap:10px;align-items:baseline;cursor:pointer;}
+.top3 .item .ttl{font-size:15px;}
+.top3 .item:first-of-type .ttl{font-size:16.5px;letter-spacing:-0.01em;}
+.rank{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;
+border-radius:50%;background:var(--warm);color:#fffefb;font-size:11.5px;font-weight:600;
+margin-right:9px;vertical-align:middle;position:relative;top:-1px;font-variant-numeric:tabular-nums;}
+.top3 .item:first-of-type .rank{width:22px;height:22px;font-size:12.5px;}
+.rest .item .ttl{font-weight:500;font-size:13.5px;}
+.item .ttl .exp{font-size:11px;color:var(--accent);font-weight:500;white-space:nowrap;transition:color 120ms ease;}
+.item .ttl:hover .exp{color:var(--ink);}
+.detail{display:none;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);}
+.item.open .detail{display:block;animation:fadein 160ms ease;}
+.detail .dtl{font-size:13px;color:#45443d;margin:0 0 8px;line-height:1.5;}
+.chips.meta{margin-bottom:0;}
+.summ{font-size:13px;color:#45443d;margin:5px 0 0;line-height:1.5;}
+.item .ttl>span:first-child{flex:1;min-width:0;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+.chip{font-size:11px;padding:2px 9px;border-radius:7px;background:var(--chip-bg);color:var(--chip-ink);white-space:nowrap;}
+.chip.org{background:#e8efed;color:#34605b;}
+.chip.type{background:#eae9ef;color:#474c55;text-transform:capitalize;}
+.chip.who{background:#f0eaf5;color:#574680;}
+.chip.red{background:var(--red-bg);color:var(--red);font-weight:600;}
+.chip.amber{background:var(--amber-bg);color:var(--amber);}
+.chip.id{background:transparent;color:#b3b2ab;padding-left:0;}
+.chip.stage{background:#e8eef2;color:#395066;}
+.chip.green{background:#eaf3ec;color:#275f3c;}
+.more{font-size:12.5px;color:var(--accent);padding:12px 0 1px;border-top:1px solid var(--line-soft);}
+.empty{font-size:13px;color:var(--muted);font-style:italic;padding:10px 0;}
+.cap{font-size:12px;color:var(--muted);margin-top:11px;padding-top:11px;border-top:1px solid var(--line-soft);}
+.ph{font-size:12.5px;color:var(--muted);font-style:italic;line-height:1.5;}
+.act{display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--line-soft);font-size:12.5px;align-items:baseline;}
+.act:first-of-type{border-top:none;}
+.surf{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;white-space:nowrap;}
+.surf.DESK{background:#e7eeee;color:#2f6f6a;}.surf.CLI{background:#ece6f2;color:#5b4a82;}.surf.JOB{background:#efece0;color:#6b6324;}.surf.BOT{background:#e3eef6;color:#1f5e8a;}
+.act .txt{flex:1;color:var(--ink);}.act .ago{font-size:11px;color:var(--muted);white-space:nowrap;}
+/* Cockpit group headers: delineate the who-acts sections */
+.grp{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);margin:20px 0 8px;padding-top:14px;border-top:1px solid var(--line);}
+.grp:first-child{margin-top:2px;padding-top:0;border-top:none;}
+.entity h3{font-size:14px;font-weight:600;margin:0 0 4px;}
+.ops li{font-size:13px;color:#3d3d37;padding:6px 0;border-top:1px solid var(--line-soft);list-style:none;}
+.note{font-size:11.5px;color:var(--muted);margin-top:18px;}
+.section-lead{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.5;max-width:66ch;}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:760px){.kanban{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.kanban{grid-template-columns:1fr;}}
+.kcol{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:9px;min-width:0;}
+.kcol-h{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:4px 4px 9px;}
+.kcol-h .kn{color:var(--muted-soft);font-weight:500;}
+.kcard{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:8px;box-shadow:var(--shadow-sm);}
+.kcard:last-child{margin-bottom:0;}
+.kcard .ttl{font-size:12.5px;font-weight:500;}
+.kcard .detail{display:none;}.kcard.open .detail{display:block;}
+/* Day-page masthead: a confident display head for the daily briefing */
+.today-head{margin:24px 0 4px;}
+.today-head::before{content:"";display:block;width:38px;height:3px;border-radius:2px;background:var(--warm);margin:0 0 12px;}
+.daydate{font-size:27px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;margin:0;color:var(--ink);text-transform:none;}
+.daysub{font-size:13px;color:var(--muted);margin:6px 0 0;}
+.today-head + .cols{margin-top:18px;}
+@keyframes fadein{from{opacity:0;transform:translateY(-2px);}to{opacity:1;transform:none;}}
+/* Maintenance "Why / Do" inline tags */
+.why-tag,.do-tag{font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:4px;margin-right:6px;}
+.why-tag{background:var(--amber-bg);color:var(--amber);}
+.do-tag{background:var(--chip-bg);color:var(--chip-ink);}
+/* Clickable tag chips + the in-place filter bar */
+.chip[data-tag]{cursor:pointer;}
+.chip[data-tag]:hover{box-shadow:inset 0 0 0 1px var(--accent);}
+#filterbar{display:none;align-items:center;gap:10px;margin:14px 0 0;padding:8px 14px;border-radius:10px;background:#e9f1f0;border:1px solid #cfe0df;font-size:12.5px;color:var(--ink);}
+#filterbar.on{display:flex;}
+#filterbar #filterbar-clear{margin-left:auto;font-size:12.5px;color:var(--accent);cursor:pointer;border:none;background:none;font-family:inherit;}
+.demobar{font-size:11.5px;color:var(--muted);background:#f0ede6;border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:14px 0 0;}
+footer{color:var(--muted-soft);font-size:11.5px;text-align:center;margin:26px auto 40px;max-width:1080px;padding:0 26px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cowork OS</h1>
+  <p class="gen" id="gen"></p>
+  <div class="tabs" id="tabs"></div>
+  <div id="filterbar"><span id="filterbar-label"></span><button id="filterbar-clear">clear filter</button></div>
+  <div class="demobar">Interactive demo with sample data. The live dashboard runs locally against real plain-text files; this page is a faithful, hand-built recreation of the look and the interactions, wired only to a fictional persona (Jordan Vale at Northwind Logistics).</div>
+  <div id="pages"></div>
+</div>
+<footer>A projection of plain-text state files, rebuilt as a calm daily briefing. Sample data only, and still evolving.</footer>
+
+<script>
+"use strict";
+
+/* ===========================================================================
+   DATA - a fictional Northwind Logistics workspace. Every view below is a
+   projection of this one object set: an item can appear on Today (ranked) and
+   on its area tab (grouped by who acts), the same way the real dashboard treats
+   items as objects shown in many views.
+   =========================================================================== */
+var DATA = {
+  persona: "Jordan Vale",
+  org: "Northwind Logistics",
+  closed_filtered: 6,
+
+  // Open items across the four areas. bucket = who acts (decisions / actions /
+  // agents). The scoring inputs (urgency, deadline, care, blocked) drive the
+  // Today ranking, mirroring the real two-axis priority score.
+  items: [
+    {id:"K2", title:"Sign off the Q3 warehouse safety audit", org:"Operations",
+     bucket:"2. Needs you - decisions", who:"Safety committee", type:"governance",
+     urgency:"high", care:true, age:"4 days old",
+     detail:"The quarterly safety audit came back clean across all three depots. Your sign-off closes it and files the record before the board update."},
+    {id:"K1", title:"Approve the depot night-shift rota change", org:"Operations",
+     bucket:"2. Needs you - decisions", who:"Priya Nair", type:"decision",
+     urgency:"high", dueSoon:true, age:"2 days old",
+     detail:"The new rota ran clean at two depots for a fortnight. Approving rolls it out to the rest before the Friday payroll cut-off."},
+    {id:"K9", title:"Sign the Q3 capex forecast", org:"Finance",
+     bucket:"2. Needs you - decisions", who:"Finance director", type:"decision",
+     urgency:"high", dueSoon:true, age:"1 day old",
+     detail:"The Q3 capital forecast is built and checked. Your sign-off releases it into the board pack."},
+    {id:"T19", title:"Approve the fuel-card spend reconciliation", org:"Finance",
+     bucket:"3. Needs you - actions", who:"Finance team", type:"task",
+     urgency:"medium", overdue:true, aged:true, age:"overdue 2 days",
+     detail:"September fuel-card spend is reconciled and ready for approval. It is two days past the month-end close date."},
+    {id:"T31", title:"Chase the Meadowbank site access permit", org:"Operations",
+     bucket:"3. Needs you - actions", who:"Council liaison", type:"task",
+     urgency:"medium", overdue:true, aged:true, age:"overdue 6 days",
+     detail:"The permit request has sat with the council for three weeks. A nudge keeps the new depot opening on schedule."},
+    {id:"K8", title:"Renegotiate the Harlow packaging contract", org:"Suppliers",
+     bucket:"2. Needs you - decisions", who:"Harlow Packaging", type:"decision",
+     urgency:"medium", dueSoon:true, age:"5 days old",
+     detail:"The packaging contract is up for renewal at a 9% increase. Worth a renegotiation before signing the new terms."},
+    {id:"K5", title:"Decide on the tyre-supplier framework renewal", org:"Fleet",
+     bucket:"2. Needs you - decisions", who:"Procurement", type:"decision",
+     urgency:"medium", dueSoon:true, age:"3 days old",
+     detail:"The current framework expires next month. Renew on existing terms, or go to market for a better rate."},
+    {id:"T28", title:"Reconcile the two depot rotas", org:"Operations",
+     bucket:"3. Needs you - actions", type:"data", urgency:"low", age:"1 day old",
+     detail:"Two depots logged overlapping shifts on the same vans. Reconcile before the Q3 sign-off above."},
+    {id:"T22", title:"Refresh the supplier contact list", org:"Suppliers",
+     bucket:"3. Needs you - actions", type:"admin", urgency:"low", age:"8 days old",
+     detail:"Three supplier contacts bounced last month. Refresh from the latest onboarding sheet."},
+    {id:"BLD-7", title:"Review the telematics dry-run results", org:"Fleet",
+     bucket:"4. Agents working", type:"build", urgency:"low", age:"today",
+     detail:"The overnight telematics dry-run finished with two non-blocking warnings. Worth a look before the go-live call."}
+  ],
+
+  // Workstream-level work per area, each with a stage.
+  pipeline: {
+    Operations:[
+      {item:"Depot automation rollout, Phase 2", stage:"In build", due:"Aug",
+       note:"Conveyor and scan-gate automation at the two largest depots."},
+      {item:"Returns process redesign", stage:"Discovery", due:"",
+       note:"Mapping the end-to-end returns flow before redesigning it."}
+    ],
+    Fleet:[
+      {item:"EV van pilot, 12 vehicles", stage:"Procurement", due:"Sep",
+       note:"First tranche of electric vans for the city routes."},
+      {item:"Telematics upgrade", stage:"Scoping", due:"",
+       note:"Real-time vehicle tracking across the whole fleet."}
+    ],
+    Suppliers:[
+      {item:"Supplier scorecard rollout", stage:"Pilot", due:"Oct",
+       note:"Quarterly performance scorecards for the top 20 suppliers."}
+    ],
+    Finance:[
+      {item:"Cost-to-serve model rebuild", stage:"In build", due:"Nov",
+       note:"Rebuilding the per-route profitability model."}
+    ]
+  },
+
+  // What Jordan personally holds (Operations).
+  responsibilities:[
+    {area:"Depot operations", cadence:"Daily", focus:"Three sites running to the daily service plan."},
+    {area:"Health and safety", cadence:"Monthly", focus:"Quarterly audit closing this week."},
+    {area:"Service-level performance", cadence:"Weekly", focus:"On-time delivery holding at 96%."}
+  ],
+
+  // Fleet modernisation roadmap as a board.
+  roadmap:[
+    {item:"EV van pilot", area:"Fleet", status:"Now", note:"12 electric vans on the city routes; charging trial in parallel."},
+    {item:"Telematics dry-run", area:"Fleet", status:"Now", note:"Real-time tracking, validating on a sample of vehicles first."},
+    {item:"Driver app refresh", area:"Fleet", status:"Next", note:"Simpler check-in and proof-of-delivery flow for drivers."},
+    {item:"Route-optimisation trial", area:"Operations", status:"Next", note:"Test dynamic routing on the two busiest depots."},
+    {item:"Depot charging infrastructure", area:"Fleet", status:"Later", note:"Sized once the EV pilot proves out the duty cycle."},
+    {item:"Fleet carbon dashboard", area:"Finance", status:"Later", note:"Per-route emissions reporting for the annual statement."},
+    {item:"Tyre-pressure sensors", area:"Fleet", status:"Done", note:"Fitted across the fleet; cut blow-outs by a third."},
+    {item:"Fuel-card consolidation", area:"Finance", status:"Done", note:"One provider, one statement, lower fees."}
+  ],
+
+  // Routines (Today right rail). Automated ones live on Heartbeat.
+  routines:[
+    {routine:"Inbox triage", cadence:"Daily", owner:"Jordan", status:"overdue", cls:"red", when:"overdue 1d", note:"Clear the operations inbox to zero."},
+    {routine:"Weekly depot review", cadence:"Weekly", owner:"Jordan", status:"due soon", cls:"amber", when:"due in 2d", note:"Walk the week's KPIs with the depot managers."}
+  ],
+
+  // Recent activity across the agent surfaces.
+  activity:[
+    {surface:"DESK", summary:"Committed the rota pilot changes", when:"14:05"},
+    {surface:"CLI", summary:"Ran the telematics dry-run", when:"09:20"},
+    {surface:"BOT", summary:"Flagged a fuel-price spike on the morning check", when:"07:02"},
+    {surface:"JOB", summary:"Depot KPI digest sent", when:"06:30"}
+  ],
+
+  // Heartbeat: scheduled jobs with run status + push/pull routing.
+  scheduler_jobs:[
+    {label:"Daily depot KPI digest", desc:"Each morning, pulls the overnight numbers from all three depots into one digest.",
+     fires:"Daily at 06:30", mode:"push", status:"ran ok", cls:"green", last_fired:"3h ago",
+     last_result:"All three depots reporting; on-time at 96%."},
+    {label:"Weekly supplier SLA sweep", desc:"Each Monday, checks the top suppliers against their service-level targets.",
+     fires:"Weekly, Mon at 07:00", mode:"pull", status:"ran ok", cls:"green", last_fired:"2d ago",
+     last_result:"20 suppliers checked; 1 below threshold (flagged on the Suppliers tab)."},
+    {label:"Fuel-price watch", desc:"Each morning, checks the wholesale fuel price and alerts on a sharp move.",
+     fires:"Daily at 08:00", mode:"push", status:"overdue", cls:"amber", last_fired:"29h ago",
+     last_result:""},
+    {label:"Month-end finance pack", desc:"On the first of the month, assembles the finance pack ready for review.",
+     fires:"Monthly on day 1", mode:"pull", status:"awaiting first run", cls:"amber", last_fired:"",
+     last_result:""}
+  ],
+
+  // Always-on assistant jobs.
+  sidekick:[
+    {name:"Daily alive-check", cadence:"daily at 07:00", state:"ok", what:"Confirms the always-on assistant is up each morning.", msg:"assistant active 1h ago"},
+    {name:"Auto-recovery watchdog", cadence:"every 5 min", state:"ok", what:"Restarts the assistant automatically if it drops.", msg:"no recovery needed lately"}
+  ],
+
+  // Automated routines (the computer runs these).
+  automated:[
+    {routine:"Archive completed job tickets", cadence:"weekly", cls:"green", when:"on track", note:"Moves closed tickets out of the live view each week."}
+  ],
+
+  // System-health signal set, shown as the lights strip and the top bar.
+  lights:[
+    {key:"Audit", state:"green", msg:"on cadence"},
+    {key:"Files", state:"green", msg:"all readable"},
+    {key:"Jobs", state:"amber", msg:"fuel-price watch overdue"},
+    {key:"Findings", state:"amber", msg:"3 to review"},
+    {key:"Auto-healed", state:"green", msg:"4 fixed this week"}
+  ],
+
+  // Standing principles (Ways of working) + key references.
+  principles:[
+    {lead:"Reversible, or it does not ship", full:"Every unattended change is verified and one step from undo."},
+    {lead:"Briefing, not cockpit", full:"Calm by default; one focal point per view; detail on demand."},
+    {lead:"One source, two renderings", full:"Files stay machine-readable; the surface is made human-readable. Never two copies to drift."},
+    {lead:"Quiet is a feature", full:"A row of greens tells you nothing needs you. The system only gets loud when something genuinely wants attention."},
+    {lead:"Default to action on the reversible", full:"Make the low-stakes calls, do them end to end, and report briefly so they can be redirected."}
+  ],
+  references:[
+    {name:"Operating manual", what:"The rules every shift follows."},
+    {name:"Open items", what:"Everything open right now, in one place."},
+    {name:"Roadmap", what:"What is built, in progress, and next."},
+    {name:"Routines", what:"Recurring jobs and who owns them."}
+  ]
+};
+
+var AREAS = ["Operations","Fleet","Suppliers","Finance"];
+
+/* ===========================================================================
+   Scoring - a faithful port of the dashboard's two-axis priority score.
+   Importance is weighted above urgency; governance / safety lift importance and
+   add a care boost; deadline proximity and age creep an item up; blocked work
+   is discounted. This is what ranks the Today briefing.
+   =========================================================================== */
+var W_I = 2.0, W_U = 1.5;
+function scoreItem(it){
+  var importance = it.care ? 3 : 2;
+  var urgency = ({high:3, medium:2, low:1})[it.urgency] || 1;
+  var deadline = it.overdue || it.dueToday ? 3 : (it.dueSoon || it.due ? 2 : 0);
+  var ageFactor = it.aged ? 1.0 : (/decision/.test(it.bucket) ? 0.5 : 0.0);
+  var careBoost = it.care ? 2 : 0;
+  var actionability = it.blocked ? 0.6 : (it.waiting ? 0.3 : 1.0);
+  var base = (W_I*importance) + (W_U*urgency) + deadline + ageFactor + careBoost;
+  return Math.round(base * actionability * 10) / 10;
+}
+
+/* ===========================================================================
+   Render helpers
+   =========================================================================== */
+function esc(x){
+  return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function bucketLabel(b){ return String(b||"").replace(/^\d+\.\s*/,""); }
+
+// Chips, type-coded. org / type / who carry data-tag so they filter in place.
+function chipsHtml(it, withOrg){
+  var out = [];
+  if(withOrg && it.org) out.push("<span class='chip org' data-tag='"+esc(it.org)+"'>"+esc(it.org)+"</span>");
+  if(it.type) out.push("<span class='chip type' data-tag='"+esc(it.type)+"'>"+esc(it.type)+"</span>");
+  if(it.who) out.push("<span class='chip who' data-tag='"+esc(it.who)+"'>"+esc(it.who)+"</span>");
+  if(it.age){
+    var ac = /overdue/.test(String(it.age).toLowerCase()) ? "red" : "";
+    out.push("<span class='chip "+ac+"'>"+esc(it.age)+"</span>");
+  }
+  if(it.urgency){
+    var u = it.urgency, ucls = u==="high" ? "red" : (u==="medium" ? "amber" : "");
+    if(ucls) out.push("<span class='chip "+ucls+"'>"+esc(u)+"</span>");
+  }
+  if(it.id) out.push("<span class='chip id'>"+esc(it.id)+"</span>");
+  return out.length ? "<div class='chips'>"+out.join("")+"</div>" : "";
+}
+
+// A Tier-1 card: title + chips + an expand affordance, with a hidden detail
+// region revealed in place on click. A rank renders the clay badge for Top-3.
+function itemHtml(it, withOrg, rank){
+  var body = it.detail ? "<p class='dtl'>"+esc(it.detail)+"</p>" : "";
+  var meta = it.bucket ? "<span class='chip'>"+esc(bucketLabel(it.bucket))+"</span>" : "";
+  var detail = "<div class='detail'>"+body+"<div class='chips meta'>"+meta+"</div></div>";
+  var badge = rank ? "<span class='rank'>"+rank+"</span>" : "";
+  return "<div class='item'>"+
+    "<div class='ttl'><span>"+badge+esc(it.title)+"</span>"+
+    "<span class='exp'>expand &#9662;</span></div>"+
+    chipsHtml(it, withOrg)+detail+"</div>";
+}
+
+/* ----- Today ----- */
+function renderToday(){
+  var now = new Date();
+  var h = now.getHours();
+  var greeting = h < 12 ? "Good morning" : (h < 18 ? "Good afternoon" : "Good evening");
+  var dateStr = now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+  // rank the pool (every open item; agents-working included, in-flight excluded)
+  var pool = DATA.items.map(function(it){ return {it:it, s:scoreItem(it)}; });
+  pool.sort(function(a,b){ return b.s - a.s; });
+  var ranked = pool.map(function(p){ return p.it; });
+  var top = ranked.slice(0,7);
+  var top3 = top.slice(0,3), rest = top.slice(3);
+  var more = Math.max(0, ranked.length - top.length);
+  var needsYou = DATA.items.filter(function(it){ return /^[23]\./.test(it.bucket); }).length;
+
+  // health bar across the top, naming any issue
+  var reds = DATA.lights.filter(function(l){ return l.state==="red"; });
+  var ambs = DATA.lights.filter(function(l){ return l.state==="amber"; });
+  var hstate = reds.length ? "red" : (ambs.length ? "amber" : "green");
+  var htext = hstate==="green" ? "All good." :
+    reds.concat(ambs).map(function(l){ return esc(l.key)+": "+esc(l.msg); }).join(" &middot; ");
+
+  var o = ["<div id='page-today' class='page active'>"];
+  o.push("<div class='healthbar "+hstate+"'><span class='dot "+hstate+"'></span><span>"+htext+"</span></div>");
+  o.push("<div class='today-head'><h2 class='daydate'>"+esc(dateStr)+"</h2>"+
+         "<p class='daysub'>"+greeting+", "+esc(DATA.persona.split(" ")[0])+". Your briefing: what needs you, what is coming, what is running.</p></div>");
+
+  o.push("<div class='cols'><div>");
+  o.push("<div class='panel'><h2>What needs you</h2>");
+  o.push("<p class='needs'><b>"+needsYou+" items</b> need you &middot; "+ranked.length+
+         " open across the workspace &middot; <span style='color:var(--muted)'>running: nightly KPI sync</span></p>");
+  o.push("<div class='top3'><p class='t3-label'>Top 3</p>");
+  top3.forEach(function(it,i){ o.push(itemHtml(it, true, i+1)); });
+  o.push("</div>");
+  if(rest.length){
+    o.push("<div class='rest'><p class='t3-label sub'>Also open, ranked</p>");
+    rest.forEach(function(it){ o.push(itemHtml(it, true)); });
+    if(more) o.push("<div class='more'>+ "+more+" more open items</div>");
+    o.push("</div>");
+  }
+  o.push("</div></div>");
+
+  // secondary column
+  o.push("<div>");
+  o.push("<div class='panel'><h2>Coming up</h2>");
+  o.push("<p class='ph'>Calendar feed is coming soon. Board-paper and go/no-go prep will surface here as a countdown once pipeline dates are set.</p>");
+  o.push("<div class='cap'>"+needsYou+" items need you &middot; meetings: calendar feed pending</div></div>");
+  o.push("<div class='panel'><h2>Routines <span class='count'>due now</span></h2>");
+  if(DATA.routines.length){
+    DATA.routines.forEach(function(r){
+      var chips = [];
+      if(r.owner) chips.push("<span class='chip who'>"+esc(r.owner)+"</span>");
+      chips.push("<span class='chip stage'>"+esc(r.cadence)+"</span>");
+      if(r.cls) chips.push("<span class='chip "+r.cls+"'>"+esc(r.when)+"</span>");
+      var note = r.note ? "<p class='summ'>"+esc(r.note)+"</p>" : "";
+      o.push("<div class='item'><div class='ttl'><span>"+esc(r.routine)+"</span></div>"+
+             "<div class='chips'>"+chips.join("")+"</div>"+note+"</div>");
+    });
+  } else {
+    o.push("<div class='empty'>Nothing due right now. Automated routines live on the Heartbeat tab.</div>");
+  }
+  o.push("</div></div></div>");
+
+  // recent activity, full width
+  o.push("<div class='panel'><h2>Recent activity</h2>");
+  DATA.activity.forEach(function(a){
+    var ago = a.when ? "<span class='ago'>"+esc(a.when)+"</span>" : "";
+    o.push("<div class='act'><span class='surf "+a.surface+"'>"+a.surface+"</span>"+
+           "<span class='txt'>"+esc(a.summary)+"</span>"+ago+"</div>");
+  });
+  o.push("<div class='note'>surface = what ran &middot; device-awareness is coming later</div>");
+  o.push("</div>");
+  o.push("</div>");
+  return o.join("");
+}
+
+/* ----- Area cockpit (group an area's items by who acts) ----- */
+function cockpit(items){
+  var order = [], byBucket = {};
+  items.forEach(function(e){
+    if(!byBucket[e.bucket]){ byBucket[e.bucket] = []; order.push(e.bucket); }
+    byBucket[e.bucket].push(e);
+  });
+  var o = [];
+  order.forEach(function(b){
+    o.push("<div class='grp'>"+esc(bucketLabel(b))+"</div>");
+    byBucket[b].forEach(function(e){ o.push(itemHtml(e, false)); });
+  });
+  return o.join("");
+}
+
+var AREA_LEAD = {
+  Operations:"Your operational home: the day-to-day running of the depots, what is open, the larger workstreams in flight, and what you personally hold. Denser than Today by design - you arrive here with a question.",
+  Fleet:"The fleet: vehicles, the modernisation roadmap, and decisions on suppliers and systems.",
+  Suppliers:"Suppliers: contracts, contacts and the health of the key relationships.",
+  Finance:"Finance: approvals, the month-end position and anything needing a financial decision."
+};
+
+function renderArea(org){
+  var id = org.toLowerCase();
+  var o = ["<div id='page-"+id+"' class='page'>"];
+  o.push("<p class='section-lead'>"+esc(AREA_LEAD[org])+"</p>");
+  o.push("<div class='cols'><div>");
+
+  // needs-you cockpit
+  var items = DATA.items.filter(function(it){ return it.org===org; })
+    .sort(function(a,b){ return scoreItem(b)-scoreItem(a); });
+  o.push("<div class='panel'><h2>Needs you</h2>");
+  o.push(items.length ? cockpit(items) : "<div class='empty'>Nothing open here right now.</div>");
+  o.push("</div>");
+
+  // pipeline
+  var pipe = DATA.pipeline[org] || [];
+  o.push("<div class='panel'><h2>Pipeline</h2>");
+  o.push("<p class='section-lead'>The larger pieces of work in progress here, each with its stage. Distinct from the day-to-day items; this is the workstream level.</p>");
+  if(pipe.length){
+    pipe.forEach(function(p){
+      var due = p.due ? "<span class='chip'>"+esc(p.due)+"</span>" : "";
+      var note = p.note ? "<p class='summ'>"+esc(p.note)+"</p>" : "";
+      o.push("<div class='item'><div class='ttl'><span>"+esc(p.item)+"</span></div>"+
+             "<div class='chips'><span class='chip stage'>"+esc(p.stage)+"</span>"+due+"</div>"+note+"</div>");
+    });
+  } else {
+    o.push("<div class='empty'>No pipeline items yet.</div>");
+  }
+  o.push("</div></div><div>");
+
+  // Operations holds the responsibility map; Fleet holds the roadmap board.
+  if(org==="Operations"){
+    o.push("<div class='panel'><h2>What I hold</h2>");
+    o.push("<p class='section-lead'>Your standing responsibility areas - what you own in this role, and the current focus of each.</p>");
+    DATA.responsibilities.forEach(function(r){
+      o.push("<div class='item'><div class='ttl'><span>"+esc(r.area)+"</span>"+
+             "<span class='chip'>"+esc(r.cadence)+"</span></div>"+
+             "<p class='summ'>"+esc(r.focus)+"</p></div>");
+    });
+    o.push("</div>");
+  } else if(org==="Fleet"){
+    o.push(roadmapPanel());
+  } else {
+    o.push("<div class='panel'><h2>Notes</h2><p class='ph'>This area fills as its pipeline is built. Empty is expected for now, not a gap.</p></div>");
+  }
+
+  o.push("</div></div></div>");
+  return o.join("");
+}
+
+function roadmapPanel(){
+  var cols = {Now:[],Next:[],Later:[],Done:[]};
+  DATA.roadmap.forEach(function(r){ (cols[r.status]||cols.Next).push(r); });
+  var o = ["<div class='panel'><h2>Roadmap <span class='count'>fleet modernisation</span></h2>"];
+  o.push("<div class='kanban'>");
+  ["Now","Next","Later","Done"].forEach(function(c){
+    var rows = cols[c];
+    o.push("<div class='kcol'><div class='kcol-h'>"+c+" <span class='kn'>"+rows.length+"</span></div>");
+    if(!rows.length) o.push("<div class='empty'>-</div>");
+    rows.forEach(function(r){
+      var chips = r.area ? "<div class='chips'><span class='chip'>"+esc(r.area)+"</span></div>" : "";
+      var detail = r.note ? "<div class='detail'><p class='dtl'>"+esc(r.note)+"</p></div>" : "";
+      var exp = r.note ? "<span class='exp'>expand &#9662;</span>" : "";
+      o.push("<div class='item kcard'><div class='ttl'><span>"+esc(r.item)+"</span>"+exp+"</div>"+chips+detail+"</div>");
+    });
+    o.push("</div>");
+  });
+  o.push("</div></div>");
+  return o.join("");
+}
+
+/* ----- Heartbeat ----- */
+function renderHeartbeat(){
+  var o = ["<div id='page-heartbeat' class='page'>"];
+  o.push("<p class='section-lead'>The heartbeat of the system: every scheduled task, what it does, when it fires, and whether it has fired. Push jobs may interrupt you; pull jobs only report to the dashboard.</p>");
+
+  o.push("<div class='panel'><h2>Scheduled jobs <span class='count'>Cowork Scheduler</span></h2>");
+  DATA.scheduler_jobs.forEach(function(j){
+    var chips = ["<span class='chip stage'>"+esc(j.fires)+"</span>"];
+    if(j.mode) chips.push("<span class='chip'>"+esc(j.mode)+"</span>");
+    chips.push("<span class='chip "+j.cls+"'>"+esc(j.status)+"</span>");
+    if(j.last_fired) chips.push("<span class='chip'>last run "+esc(j.last_fired)+"</span>");
+    var detail = j.last_result ? "<div class='detail'><p class='dtl'>Last result: "+esc(j.last_result)+"</p></div>" : "";
+    var exp = j.last_result ? "<span class='exp'>expand &#9662;</span>" : "";
+    var summ = j.desc ? "<p class='summ'>"+esc(j.desc)+"</p>" : "";
+    var dot = j.cls || "muted";
+    o.push("<div class='item'><div class='ttl'><span><span class='dot "+dot+"' style='display:inline-block;margin-right:7px'></span>"+
+           esc(j.label)+"</span>"+exp+"</div>"+summ+"<div class='chips'>"+chips.join("")+"</div>"+detail+"</div>");
+  });
+  o.push("</div>");
+
+  o.push("<div class='panel'><h2>Always-on assistant <span class='count'>keeps the bot running</span></h2>");
+  DATA.sidekick.forEach(function(j){
+    var dot = j.state==="ok" ? "green" : "amber";
+    var tail = j.msg ? " - "+esc(j.msg) : "";
+    o.push("<div class='item'><div class='ttl'><span><span class='dot "+dot+"' style='display:inline-block;margin-right:7px'></span>"+
+           esc(j.name)+"</span><span class='chip'>"+esc(j.cadence)+"</span></div>"+
+           "<p class='summ'>"+esc(j.what)+tail+"</p></div>");
+  });
+  o.push("</div>");
+
+  o.push("<div class='panel'><h2>Automated routines <span class='count'>the computer runs these</span></h2>");
+  DATA.automated.forEach(function(r){
+    var chips = ["<span class='chip stage'>"+esc(r.cadence)+"</span>"];
+    if(r.cls) chips.push("<span class='chip "+r.cls+"'>"+esc(r.when)+"</span>");
+    var note = r.note ? "<p class='summ'>"+esc(r.note)+"</p>" : "";
+    o.push("<div class='item'><div class='ttl'><span>"+esc(r.routine)+"</span></div>"+
+           "<div class='chips'>"+chips.join("")+"</div>"+note+"</div>");
+  });
+  o.push("</div>");
+
+  o.push("<div class='panel'><h2>Status lights</h2>");
+  DATA.lights.forEach(function(l){
+    o.push("<div class='act'><span class='dot "+l.state+"' style='align-self:center'></span>"+
+           "<span class='txt'>"+esc(l.key)+"</span><span class='ago'>"+esc(l.msg)+"</span></div>");
+  });
+  o.push("<div class='note'>Audit cadence, file sizes, job runs, open findings and self-healed fixes - quiet greens mean nothing needs you.</div>");
+  o.push("</div>");
+  o.push("</div>");
+  return o.join("");
+}
+
+/* ----- Ways of working ----- */
+function renderWays(){
+  var o = ["<div id='page-ways' class='page'>"];
+  o.push("<p class='section-lead'>The operating manual: the ways of working that hold across everything. Reference material, so you visit it rarely. Click a principle to read the detail.</p>");
+  o.push("<div class='panel'><h2>Standing principles <span class='count'>numbered for reference, not priority</span></h2>");
+  DATA.principles.forEach(function(p,i){
+    var detail = p.full ? "<div class='detail'><p class='dtl'>"+esc(p.full)+"</p></div>" : "";
+    var exp = p.full ? "<span class='exp'>expand &#9662;</span>" : "";
+    o.push("<div class='item'><div class='ttl'><span><b>"+(i+1)+".</b> "+esc(p.lead)+"</span>"+exp+"</div>"+detail+"</div>");
+  });
+  o.push("</div>");
+  o.push("<div class='panel'><h2>Key references</h2>");
+  DATA.references.forEach(function(r){
+    o.push("<div class='item'><div class='ttl'><span>"+esc(r.name)+"</span></div>"+
+           "<p class='summ'>"+esc(r.what)+"</p></div>");
+  });
+  o.push("</div></div>");
+  return o.join("");
+}
+
+/* ===========================================================================
+   Assemble the page + wire the interactions
+   =========================================================================== */
+(function(){
+  // generated line
+  var now = new Date();
+  function pad(n){ return (n<10?"0":"")+n; }
+  var gen = now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+" "+pad(now.getHours())+":"+pad(now.getMinutes());
+  document.getElementById("gen").innerHTML = "generated "+gen+" &middot; "+DATA.items.length+
+    " open items &middot; "+DATA.closed_filtered+" closed filtered &middot; sample data";
+
+  // tab bar + status strip
+  var tabsDef = [["today","Today"]].concat(AREAS.map(function(a){ return [a.toLowerCase(), a]; }))
+    .concat([["heartbeat","Heartbeat"],["ways","Ways of working"]]);
+  var tb = ["",""];
+  tabsDef.forEach(function(t){
+    tb.push("<button class='tab' role='tab' aria-selected='"+(t[0]==="today")+"' data-tab='"+t[0]+"'>"+t[1]+"</button>");
+  });
+  tb.push("<div class='strip'>");
+  DATA.lights.forEach(function(l){
+    tb.push("<span class='light' title='"+esc(l.msg)+"'><span class='dot "+l.state+"'></span>"+esc(l.key)+"</span>");
+  });
+  tb.push("</div>");
+  document.getElementById("tabs").innerHTML = tb.join("");
+
+  // pages
+  var pages = renderToday();
+  AREAS.forEach(function(a){ pages += renderArea(a); });
+  pages += renderHeartbeat();
+  pages += renderWays();
+  document.getElementById("pages").innerHTML = pages;
+
+  var tabs = document.querySelectorAll(".tab");
+  var pageEls = document.querySelectorAll(".page");
+  var fbar = document.getElementById("filterbar");
+  var flabel = document.getElementById("filterbar-label");
+  var fclear = document.getElementById("filterbar-clear");
+
+  function clearFilter(){
+    document.querySelectorAll(".item").forEach(function(it){ it.style.display=""; });
+    document.querySelectorAll(".panel").forEach(function(p){ p.style.display=""; });
+    fbar.classList.remove("on");
+  }
+  function show(id){
+    tabs.forEach(function(t){ t.setAttribute("aria-selected", t.dataset.tab===id); });
+    pageEls.forEach(function(p){ p.classList.toggle("active", p.id==="page-"+id); });
+    clearFilter();
+  }
+  tabs.forEach(function(t){ t.addEventListener("click", function(){ show(t.dataset.tab); }); });
+
+  // expand-in-place: clicking a card title reveals its detail region
+  document.querySelectorAll(".item .ttl").forEach(function(t){
+    t.addEventListener("click", function(){
+      var it = t.closest(".item"), open = it.classList.toggle("open");
+      var e = t.querySelector(".exp"); if(e) e.innerHTML = open ? "collapse &#9652;" : "expand &#9662;";
+    });
+  });
+
+  // tag click = in-place filter of the current page, with a clear bar
+  function setFilter(tag){
+    var page = document.querySelector(".page.active"); if(!page) return;
+    page.querySelectorAll(".item").forEach(function(it){
+      var chips = it.querySelectorAll(".chip[data-tag]");
+      var match = Array.prototype.some.call(chips, function(x){ return x.getAttribute("data-tag")===tag; });
+      it.style.display = match ? "" : "none";
+    });
+    page.querySelectorAll(".panel").forEach(function(p){
+      if(!p.querySelector(".item")) return;
+      var vis = Array.prototype.some.call(p.querySelectorAll(".item"), function(it){ return it.style.display!=="none"; });
+      p.style.display = vis ? "" : "none";
+    });
+    flabel.textContent = "Filtered by: "+tag;
+    fbar.classList.add("on");
+  }
+  document.body.addEventListener("click", function(ev){
+    var c = ev.target.closest && ev.target.closest(".chip[data-tag]");
+    if(c){ ev.preventDefault(); ev.stopPropagation(); setFilter(c.getAttribute("data-tag")); }
+  });
+  fclear.addEventListener("click", clearFilter);
+  document.addEventListener("keydown", function(ev){ if(ev.key==="Escape") clearFilter(); });
+})();
+</script>
+</body>
+</html>
