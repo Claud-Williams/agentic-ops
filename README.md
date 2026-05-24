@@ -1,7 +1,7 @@
 <p align="left">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/wordmark-dark.svg">
-    <img src="docs/wordmark.svg" alt="agentic-ops" width="280">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/wordmark-pulse-dark.gif">
+    <img src="docs/wordmark-pulse.gif" alt="agentic-ops" width="280">
   </picture>
 </p>
 
