@@ -15,7 +15,13 @@ set -u
 REPO="${1:-}"
 [ -n "$REPO" ] && [ -d "$REPO/.git" ] || { echo "usage: leak_audit.sh <git_repo_dir>" >&2; exit 2; }
 
-SECRET='-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}'
+# Bare-marker private-key detection (gitleaks rule). Catches every PEM-style
+# BEGIN ... PRIVATE KEY marker (RSA / EC / OPENSSH / ENCRYPTED / PGP BLOCK
+# variants, etc.) regardless of body, line length, or whether an END follows.
+# Prose mentions of the marker also block by design - handle false-positives
+# at the source (reword the line) or via a targeted allowlist, not by
+# weakening detection.
+SECRET='-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY( BLOCK)?-----|AKIA[0-9A-Z]{16}'
 HOMEPATH='/(Users|home)/[A-Za-z0-9._-]+'
 IDENTITY='EXAMPLE_NAME|example-handle'           # replace with your own
 PAT="$SECRET|$HOMEPATH|$IDENTITY"
@@ -24,7 +30,7 @@ hits=0
 echo "=== leak-audit: $REPO ==="
 
 echo "--- 1. working tree (file content) ---"
-out="$(grep -rInI --exclude-dir=.git -E -e "$PAT" "$REPO" 2>/dev/null)" || true
+out="$(grep -rInI --exclude-dir=.git --exclude=scrub_gate.sh --exclude=leak_audit.sh --exclude=permission-drift.sh -E -e "$PAT" "$REPO" 2>/dev/null)" || true
 if [ -n "$out" ]; then printf '%s\n' "$out" | sed 's/^/    /' | head -20; hits=$((hits+1)); else echo "    clean"; fi
 
 echo "--- 2. git metadata (author / committer / email / messages, all history) ---"

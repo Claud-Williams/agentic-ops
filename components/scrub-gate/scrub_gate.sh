@@ -10,12 +10,14 @@ set -u
 TARGET="${1:-}"
 [ -n "$TARGET" ] && [ -d "$TARGET" ] || { echo "usage: scrub_gate.sh <target_dir>" >&2; exit 2; }
 
-GREP=(grep -rInI --exclude-dir=.git --exclude=scrub_gate.sh)
+GREP=(grep -rInI --exclude-dir=.git --exclude=scrub_gate.sh --exclude=leak_audit.sh --exclude=permission-drift.sh)
 BLOCK=0; WARN=0
 
 scan() {  # <bucket> <label> <regex>
     local bucket="$1" label="$2" rx="$3" out
-    out="$("${GREP[@]}" -E "$rx" "$TARGET" 2>/dev/null)" || true
+    # -e is required: some patterns begin with a dash and grep would otherwise
+    # read them as options and silently no-op.
+    out="$("${GREP[@]}" -E -e "$rx" "$TARGET" 2>/dev/null)" || true
     [ -n "$out" ] || return 0
     echo "${bucket}: ${label}"
     printf '%s\n' "$out" | sed 's/^/    /' | head -30; echo
@@ -25,7 +27,14 @@ scan() {  # <bucket> <label> <regex>
 echo "=== scrub_gate: scanning $TARGET ==="; echo
 
 # --- secrets (always block) ---
-scan BLOCK "private key material"  '-----BEGIN [A-Z ]*PRIVATE KEY-----'
+# Bare-marker private-key detection (gitleaks rule). Catches every PEM-style
+# BEGIN ... PRIVATE KEY marker (RSA / EC / OPENSSH / ENCRYPTED / PGP BLOCK
+# variants, etc.) regardless of body, line length, or whether an END follows -
+# so encrypted keys, EC keys with short lines, and truncated keys all block.
+# Prose mentions of the marker also block by design: handle false-positives at
+# the source (reword the line) or via a targeted allowlist, not by weakening
+# detection.
+scan BLOCK "private key material"  '-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY( BLOCK)?-----'
 scan BLOCK "aws access key id"     'AKIA[0-9A-Z]{16}'
 scan BLOCK "assigned secret/token" '(api[_-]?key|secret|password|token)[" '"'"']*[:=][" '"'"']*[A-Za-z0-9/_+.-]{12,}'
 
