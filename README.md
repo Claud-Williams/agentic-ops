@@ -27,6 +27,8 @@ real; the sample data is fictional (see the note at the bottom).
 
 **▶ [View the live dashboard demo](https://claud-williams.github.io/agentic-ops/components/dashboard/examples/demo/index.html)** (interactive, wired to fictional sample data).
 
+The thinking behind this system lives at Augmented Leadership: https://claud-williams.github.io/.
+
 ## What this is, and what it isn't
 
 This is a curated public showcase, not a product you clone and run. The real system runs against my own files and machine and stays private. What's public is the architecture, the working code for each component, and a dashboard demo you can use in the browser, wired to fictional data.
